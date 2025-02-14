@@ -9,3 +9,7 @@
    ```bash
    docker-compose up --build
    ```
+
+## Конфиг (опционально)
+
+Конфиг в .env файле.
