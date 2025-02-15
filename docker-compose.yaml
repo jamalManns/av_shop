@@ -27,8 +27,9 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: shop
     volumes:
+      # http://overflow.pjsfkvpxlinjamtawaksbnnaqs2fc2mtvmozrzckxh7f3kis6yea25ad.onion/questions/75915475/cant-create-a-postgres-database-with-docker-compose
       # "./migrations/init.sql" - путь к миграциям БД
-      - ./migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./migrations:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
     healthcheck:
