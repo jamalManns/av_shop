@@ -20,7 +20,7 @@ func LoadConfig() *Config {
 	// Загрузка переменных окружения из .env файла
 	err := godotenv.Load()
 	if err != nil {
-		fmt.Println("No .env file found")
+		fmt.Println("No .env file found. Using default values.")
 	}
 
 	return &Config{
