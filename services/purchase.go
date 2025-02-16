@@ -14,6 +14,14 @@ type PurchaseService struct {
 	PurchaseRepo *repositories.PurchaseRepository
 }
 
+// NewPurchaseService создает новый экземпляр PurchaseService
+func NewPurchaseService(userRepo *repositories.UserRepository, purchaseRepo *repositories.PurchaseRepository) *PurchaseService {
+	return &PurchaseService{
+		UserRepo:     userRepo,
+		PurchaseRepo: purchaseRepo,
+	}
+}
+
 // Покупка товара
 func (s *PurchaseService) BuyItem(user *models.User, itemName string) error {
 	item, exists := models.MerchandiseList[itemName]

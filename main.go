@@ -4,9 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"net/http"
 
 	"avito.ru/shop/config"
+	"avito.ru/shop/handlers"
+	"avito.ru/shop/repositories"
+	"avito.ru/shop/services"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 
@@ -34,13 +36,21 @@ func main() {
 		log.Fatalf("Failed to apply migrations: %v", err)
 	}
 
+	// Инициализация сервисов
+	userRepo := userRepository(db)
+	transactionRepo := transactionRepository(db)
+	purchaseRepo := purchaseRepository(db)
+
+	userService := services.NewUserService(userRepo, transactionRepo)
+	purchaseService := services.NewPurchaseService(userRepo, purchaseRepo)
+
+	// Инициализация обработчиков
+	handler := handlers.NewHandler(userService, purchaseService)
+
 	// Инициализация Gin-роутера
 	router := gin.Default()
 
-	// Пока роуты не добавлены
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"message": "Hello, Avito!"})
-	})
+	handler.SetupRoutes(router, cfg.JWTSecret)
 
 	// Запуск сервера
 	port := ":8080"
@@ -80,4 +90,16 @@ func applyMigrations(cfg *config.Config) error {
 
 	log.Println("Migrations applied successfully")
 	return nil
+}
+
+func userRepository(db *sql.DB) *repositories.UserRepository {
+	return &repositories.UserRepository{DB: db}
+}
+
+func transactionRepository(db *sql.DB) *repositories.TransactionRepository {
+	return &repositories.TransactionRepository{DB: db}
+}
+
+func purchaseRepository(db *sql.DB) *repositories.PurchaseRepository {
+	return &repositories.PurchaseRepository{DB: db}
 }

@@ -14,6 +14,14 @@ type UserService struct {
 	TransactionRepo *repositories.TransactionRepository
 }
 
+// NewUserService создает новый экземпляр UserService
+func NewUserService(userRepo *repositories.UserRepository, transactionRepo *repositories.TransactionRepository) *UserService {
+	return &UserService{
+		UserRepo:        userRepo,
+		TransactionRepo: transactionRepo,
+	}
+}
+
 // RegisterUser регистрирует нового пользователя
 func (s *UserService) RegisterUser(username string) (*models.User, error) {
 	existingUser, _ := s.UserRepo.GetUserByUsername(username)
