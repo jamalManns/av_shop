@@ -9,6 +9,11 @@ import (
 	"avito.ru/shop/config"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -22,6 +27,12 @@ func main() {
 		log.Fatalf("Failed to connect to DB: %v", err)
 	}
 	defer db.Close()
+
+	// Применение миграций
+	err = applyMigrations(cfg)
+	if err != nil {
+		log.Fatalf("Failed to apply migrations: %v", err)
+	}
 
 	// Инициализация Gin-роутера
 	router := gin.Default()
@@ -49,4 +60,24 @@ func connectDB(cfg *config.Config) (*sql.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+func applyMigrations(cfg *config.Config) error {
+	migrationSource := "file://migrations"
+	migrationURL := fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName,
+	)
+
+	m, err := migrate.New(migrationSource, migrationURL)
+	if err != nil {
+		return err
+	}
+
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		return err
+	}
+
+	log.Println("Migrations applied successfully")
+	return nil
 }
