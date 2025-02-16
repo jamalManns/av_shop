@@ -56,3 +56,8 @@ func (s *UserService) TransferCoins(fromUser, toUser *models.User, amount int) e
 	}
 	return s.TransactionRepo.CreateTransaction(txn)
 }
+
+// GetUserByID получает пользователя по ID
+func (s *UserService) GetUserByID(userID int64) (*models.User, error) {
+	return s.UserRepo.GetUserByID(userID)
+}
