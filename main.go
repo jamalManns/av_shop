@@ -46,12 +46,12 @@ func main() {
 	infoService := services.NewInfoService(userRepo, transactionRepo, purchaseRepo)
 
 	// Инициализация обработчиков
-	handler := handlers.NewHandler(userService, purchaseService, infoService)
+	handler := handlers.NewHandler(userService, purchaseService, infoService, []byte(cfg.JWTSecret))
 
 	// Инициализация Gin-роутера
 	router := gin.Default()
 
-	handler.SetupRoutes(router, cfg.JWTSecret)
+	handler.SetupRoutes(router)
 
 	// Запуск сервера
 	port := ":8080"

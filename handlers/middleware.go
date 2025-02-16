@@ -15,20 +15,22 @@ type Handler struct {
 	SendCoinHandler *SendCoinHandler // Ссылка на обработчик перевода монет
 	BuyItemHandler  *BuyItemHandler  // Ссылка на обработчик покупки товаров
 	InfoHandler     *InfoHandler
+	secret          []byte
 }
 
-func NewHandler(userService *services.UserService, purchaseService *services.PurchaseService, infoService *services.InfoService) *Handler {
+func NewHandler(userService *services.UserService, purchaseService *services.PurchaseService, infoService *services.InfoService, secret []byte) *Handler {
 	return &Handler{
 		UserService:     userService,
 		PurchaseService: purchaseService,
-		AuthHandler:     &AuthHandler{Service: userService},        // Инициализация обработчика аутентификации
-		SendCoinHandler: &SendCoinHandler{Service: userService},    // Инициализация обработчика перевода монет
-		BuyItemHandler:  &BuyItemHandler{Service: purchaseService}, // Инициализация обработчика покупки товаров
-		InfoHandler:     &InfoHandler{Service: infoService},        // Инициализация обработчика покупки товаров
+		AuthHandler:     &AuthHandler{Service: userService, Secret: secret}, // Инициализация обработчика аутентификации
+		SendCoinHandler: &SendCoinHandler{Service: userService},             // Инициализация обработчика перевода монет
+		BuyItemHandler:  &BuyItemHandler{Service: purchaseService},          // Инициализация обработчика покупки товаров
+		InfoHandler:     &InfoHandler{Service: infoService},                 // Инициализация обработчика покупки товаров
+		secret:          secret,
 	}
 }
 
-func (h *Handler) SetupRoutes(router *gin.Engine, secretKey string) {
+func (h *Handler) SetupRoutes(router *gin.Engine) {
 	// Hello route
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "Hello, Avito!"})
@@ -39,7 +41,7 @@ func (h *Handler) SetupRoutes(router *gin.Engine, secretKey string) {
 
 	// Защищенные маршруты
 	protected := router.Group("/api")
-	protected.Use(middleware.AuthMiddleware(secretKey))
+	protected.Use(middleware.AuthMiddleware(h.secret))
 	{
 		protected.POST("/sendCoin", h.SendCoinHandler.SendCoins)
 		protected.GET("/buy/:item", h.BuyItemHandler.BuyItem)

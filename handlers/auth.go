@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -13,7 +14,7 @@ import (
 // Обработчик для авторизации.
 type AuthHandler struct {
 	Service *services.UserService
-	Secret  string
+	Secret  []byte
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
@@ -33,11 +34,11 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		"userID": user.ID,
 		"exp":    time.Now().Add(time.Hour * 24 * 365).Unix(),
 	})
-	tokenString, err := token.SignedString([]byte(h.Secret))
+	tokenString, err := token.SignedString(h.Secret)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{Errors: "Failed to generate token"})
 		return
 	}
-
+	log.Printf("New user ID created: %v", user.ID)
 	c.JSON(http.StatusOK, models.AuthResponse{Token: tokenString})
 }

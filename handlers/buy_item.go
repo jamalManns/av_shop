@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"fmt"
+	"log"
 	"net/http"
+	"strconv"
 
 	"avito.ru/shop/models"
 	"avito.ru/shop/services"
@@ -25,9 +28,17 @@ func (h *BuyItemHandler) BuyItem(c *gin.Context) {
 		return
 	}
 
-	user, err := h.Service.UserRepo.GetUserByID(userID.(int64))
+	log.Printf("Parsed user id from context: %v", userID)
+	userIDint, err := strconv.ParseInt(userID.(string), 10, 64)
+
 	if err != nil {
-		c.JSON(http.StatusNotFound, models.ErrorResponse{Errors: "User not found"})
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{Errors: "Failed to convert user id to int64."})
+		return
+	}
+
+	user, err := h.Service.UserRepo.GetUserByID(userIDint)
+	if err != nil {
+		c.JSON(http.StatusNotFound, models.ErrorResponse{Errors: fmt.Sprintf("User id %v not found", userIDint)})
 		return
 	}
 

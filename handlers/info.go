@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"avito.ru/shop/models"
 	"avito.ru/shop/services"
@@ -21,8 +22,14 @@ func (h *InfoHandler) GetUserInfo(c *gin.Context) {
 		return
 	}
 
+	userIDint, err := strconv.ParseInt(userID.(string), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{Errors: "Failed to convert user id to int64."})
+		return
+	}
+
 	// Получаем информацию о пользователе
-	info, err := h.Service.GetUserInfo(userID.(int64))
+	info, err := h.Service.GetUserInfo(userIDint)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{Errors: err.Error()})
 		return

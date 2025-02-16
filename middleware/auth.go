@@ -3,7 +3,9 @@ package middleware
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +14,7 @@ import (
 
 // AuthMiddleware проверяет JWT-токен в заголовке Authorization
 // SecretKey используется для подписи JWT
-func AuthMiddleware(secretKey string) gin.HandlerFunc {
+func AuthMiddleware(secretKey []byte) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Получаем заголовок Authorization
 		authHeader := c.GetHeader("Authorization")
@@ -21,6 +23,7 @@ func AuthMiddleware(secretKey string) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		log.Printf("Received token: %s", authHeader)
 
 		// Извлекаем токен из заголовка
 		tokenString := strings.Split(authHeader, "Bearer ")
@@ -31,7 +34,8 @@ func AuthMiddleware(secretKey string) gin.HandlerFunc {
 		}
 
 		tokenString = strings.Fields(tokenString[1])
-		if len(tokenString) == 0 {
+		if len(tokenString) != 1 {
+			// Только одна строка в массиве.
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token not found"})
 			c.Abort()
 			return
@@ -46,8 +50,14 @@ func AuthMiddleware(secretKey string) gin.HandlerFunc {
 			return secretKey, nil
 		})
 
-		if err != nil || !token.Valid {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": fmt.Sprintf("%v", err)})
+			c.Abort()
+			return
+		}
+
+		if !token.Valid {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": fmt.Sprintf("Invalid or expired token: %v", tokenString[0])})
 			c.Abort()
 			return
 		}
@@ -61,8 +71,9 @@ func AuthMiddleware(secretKey string) gin.HandlerFunc {
 				return
 			}
 
-			// Добавляем userID в контекст
-			c.Set("userID", fmt.Sprintf("%v", userID))
+			// Добавляем userID в контекст как строку
+			c.Set("userID", strconv.FormatFloat(userID.(float64), 'f', 0, 64)) // Преобразуем float64 в строку
+			log.Printf("Extracted userID from token: %v", userID)
 			c.Next()
 		} else {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})

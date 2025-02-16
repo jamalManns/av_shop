@@ -37,6 +37,10 @@ func (s *UserService) RegisterUser(username string) (*models.User, error) {
 	if err != nil {
 		return nil, err
 	}
+	newUser, err = s.UserRepo.GetUserByUsername(username)
+	if err != nil {
+		return nil, err
+	}
 	return newUser, nil
 }
 
