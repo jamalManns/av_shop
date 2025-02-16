@@ -16,8 +16,22 @@
 
 Конфиг в .env файле.
 
-## Run
+## Запуск
+
+Тест:
 
 ```
 curl http://localhost:8080
+```
+
+Купить:
+
+```
+bash scripts/buy.sh
+```
+
+Информация о пользователе:
+
+```
+bash scripts/user_info.sh
 ```
