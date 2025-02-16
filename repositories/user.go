@@ -11,6 +11,7 @@ type UserRepository struct {
 	DB *sql.DB
 }
 
+// GetUserByUsername получает пользователя по имени
 func (r *UserRepository) GetUserByUsername(username string) (*models.User, error) {
 	var user models.User
 	err := r.DB.QueryRow("SELECT id, username, balance FROM users WHERE username = $1", username).Scan(&user.ID, &user.Username, &user.Balance)
@@ -23,11 +24,13 @@ func (r *UserRepository) GetUserByUsername(username string) (*models.User, error
 	return &user, nil
 }
 
+// CreateUser создает нового пользователя
 func (r *UserRepository) CreateUser(user *models.User) error {
 	_, err := r.DB.Exec("INSERT INTO users (username, balance) VALUES ($1, $2)", user.Username, user.Balance)
 	return err
 }
 
+// UpdateBalance обновляет баланс пользователя
 func (r *UserRepository) UpdateBalance(userID int64, amount int) error {
 	_, err := r.DB.Exec("UPDATE users SET balance = balance + $1 WHERE id = $2", amount, userID)
 	return err

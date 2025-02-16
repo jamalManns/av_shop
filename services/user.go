@@ -14,6 +14,7 @@ type UserService struct {
 	TransactionRepo *repositories.TransactionRepository
 }
 
+// RegisterUser регистрирует нового пользователя
 func (s *UserService) RegisterUser(username string) (*models.User, error) {
 	existingUser, _ := s.UserRepo.GetUserByUsername(username)
 	if existingUser != nil {
@@ -31,6 +32,7 @@ func (s *UserService) RegisterUser(username string) (*models.User, error) {
 	return newUser, nil
 }
 
+// TransferCoins переводит монеты между пользователями
 func (s *UserService) TransferCoins(fromUser, toUser *models.User, amount int) error {
 	if fromUser.Balance < amount {
 		return errors.New("insufficient balance")
