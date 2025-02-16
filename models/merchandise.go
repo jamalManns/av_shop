@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type Merchandise struct {
 	Name  string `json:"name"`
 	Price int    `json:"price"`
@@ -27,6 +29,7 @@ type Merchandise struct {
 Предполагается, что в магазине бесконечный запас каждого вида мерча.
 */
 
+// Список доступных товаров
 var MerchandiseList = map[string]Merchandise{
 	"t-shirt":    {"t-shirt", 80},
 	"cup":        {"cup", 20},
@@ -38,4 +41,13 @@ var MerchandiseList = map[string]Merchandise{
 	"socks":      {"socks", 10},
 	"wallet":     {"wallet", 50},
 	"pink-hoody": {"pink-hoody", 500},
+}
+
+// Модель покупки
+type Purchase struct {
+	ID          int64     `json:"id"`
+	UserID      int64     `json:"user_id"`
+	ItemName    string    `json:"item_name"`
+	Price       int       `json:"price"`
+	PurchasedAt time.Time `json:"purchased_at"`
 }
