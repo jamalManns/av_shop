@@ -20,3 +20,9 @@ type ErrorResponse struct {
 type AuthResponse struct {
 	Token string `json:"token"`
 }
+
+// SendCoinRequest содержит данные для перевода монет
+type SendCoinRequest struct {
+	ToUser string `json:"toUser" binding:"required"`
+	Amount int    `json:"amount" binding:"required,gt=0"`
+}
