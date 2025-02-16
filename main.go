@@ -35,16 +35,18 @@ func main() {
 		log.Fatalf("Failed to apply migrations: %v", err)
 	}
 
-	// Инициализация сервисов
+	// Инициализация репозиториев
 	userRepo := userRepository(db)
 	transactionRepo := transactionRepository(db)
 	purchaseRepo := purchaseRepository(db)
 
+	// Инициализация сервисов
 	userService := services.NewUserService(userRepo, transactionRepo)
 	purchaseService := services.NewPurchaseService(userRepo, purchaseRepo)
+	infoService := services.NewInfoService(userRepo, transactionRepo, purchaseRepo)
 
 	// Инициализация обработчиков
-	handler := handlers.NewHandler(userService, purchaseService)
+	handler := handlers.NewHandler(userService, purchaseService, infoService)
 
 	// Инициализация Gin-роутера
 	router := gin.Default()
