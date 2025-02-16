@@ -10,7 +10,6 @@ import (
 	"avito.ru/shop/repositories"
 	"avito.ru/shop/services"
 	"github.com/gin-gonic/gin"
-	_ "github.com/lib/pq"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
