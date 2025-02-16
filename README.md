@@ -1,5 +1,7 @@
 # Avito Shop
 
+[task](https://github.com/avito-tech/tech-internship/tree/main/Tech%20Internships/Backend/Backend-trainee-assignment-winter-2025)
+
 ## Запуск проекта
 
 1. Установите Docker и Docker Compose.
